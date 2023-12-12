@@ -1,0 +1,538 @@
+---
+title: "AFDMD-111 Estadística"
+author: "edward roberto cauich soberanis"
+date: "09/10/2023"
+output:
+  rmdformats::readthedown:
+    highlight: kate
+    cards: no
+subtitle: Cálculo de probabilidad de VAs
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Variables aleatorias discretas
+
+Como se ha mencionado en clases pasadas existen tres tipos de variables aleatorias; discretas, continuas y mixtas. Para nuestro curso, estaremos interesados en las variables aleatorias discretas y continuas. Recordemos que para las variables aleatorias discretas contamos con dos funciones que las describen totalmente; la función de distribución y la función de densidad.
+La función de distribución está dada por:
+$$
+F_X(x) = P(X \le x)
+$$
+para cualquier valor $x \in \mathbb{R}$. La función de masa de probabilidad es la otra función que se define de la siguiente manera:
+$$
+p_X(k) = P(X=k)
+$$
+Por lo tanto, cuando se nos dá una variable aleatoria discreta ésta está definida por una fórmula que representa $p_X(k)$ o $F_X(x)$. La variable aleatoria binomial, por ejemplo está dada por:
+$$
+p_X(k) = \binom{n}{k}p^k(1-p)^{n-k}\; \;\;\; k=0,1,2, \ldots n
+$$
+En R, los comandos `dbinom, pbinom, rbinom` y `qbinom` generan las pmfs, distribuciones y números aleatorios relacionados a la variable aleatoria discreta Binomial. Por ejemplo, el siguiente código genera $100$ números aleatorios de una distriubción binomial con parámetros $n=16$, $p=0.1$ y posteriormente se grafican.
+
+```{r binRV, fig.width= 6, fig.height=3.4}
+vars <-rbinom(100, size=16, prob=0.1)
+plot(vars, type="l", main="Números binomiales", xlab="iteración", ylab="Valores")
+```
+
+## Actividad
+
+Investigue la generación de *pmfs* y *cdfs* discretas en R o python y posteriormente calcule las siguientes probabilidades usando únicamente código:
+
+1. Sea $X$ una variable aleatoria que tiene distribución binomial con $p=0.4$ y $n=20$. Calcular:
+a. $P(X\le 6)$
+```{r a}
+library(ggplot2)
+
+# Definir los parámetros
+p <- 0.4  # Probabilidad de exito
+n <- 20   # Numero
+
+# Crear un dataframe con la distribución binomial
+df <- data.frame(x = 0:n)
+df$probabilidad <- dbinom(df$x, size = n, prob = p)
+
+# Crear un gráfico de barras de la distribución binomial
+ggplot(df, aes(x, probabilidad)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  geom_vline(aes(xintercept = 6), linetype = "dashed", color = "red", size = 1) +
+  annotate("text", x = 6, y = max(df$probabilidad)/2, label = "P(X <= 6)", color = "red") +
+  labs(x = "X", y = "P(X)", title = "Distribución Binomial")
+
+```
+
+b. $P(X\ge 12)$
+```{r}
+p <- 0.4  # Probabilidad de éxito
+n <- 20   # Número de ensayos
+
+# Calcular P(X >= 12)
+probabilidad <- 1 - pbinom(11, size = n, prob = p)
+
+df <- data.frame(x = 0:n)
+df$probabilidad <- dbinom(df$x, size = n, prob = p)
+
+# Crear un gráfico de barras de la distribución binomial
+ggplot(df, aes(x, probabilidad)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  geom_vline(aes(xintercept = 11), linetype = "dashed", color = "red", size = 1) +
+  annotate("text", x = 11, y = max(df$probabilidad)/2, label = "P(X >= 12)", color = "red") +
+  labs(x = "X", y = "P(X)", title = "Distribución Binomial")
+```
+
+
+c. $P(X=8)$
+```{r c}
+p <- 0.4  # Probabilidad de éxito
+n <- 20   # Número de ensayos
+
+# Calcular P(X = 8)
+probabilidad <- dbinom(8, size = n, prob = p)
+
+df <- data.frame(x = 0:n)
+df$probabilidad <- dbinom(df$x, size = n, prob = p)
+
+# Crear un gráfico de barras de la distribución binomial
+ggplot(df, aes(x, probabilidad)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  geom_vline(aes(xintercept = 8), linetype = "dashed", color = "red", size = 1) +
+  annotate("text", x = 8, y = max(df$probabilidad)/2, label = "P(X = 8)", color = "red") +
+  labs(x = "X", y = "P(X)", title = "Distribución Binomial")
+
+```
+
+
+
+2. El comando `sample`, me permite generar números aleatorios con una *pmf* que define el usuario. Generar 100 números aleatorios con las siguientes pmfs:
+a. $p_X(k) = {5\choose k}\left(\frac{1}{5}\right)^k \left(\frac{4}{5}\right)^{5-k}, \;\; k=0,1,2,3,4,5.$
+
+```{r a1}
+
+k <- 1:5
+probabilidades <- (5/k)*(1/5)^k*(4/5)^(5-k)
+
+# Normalizar las probabilidades para que sumen 1
+probabilidades <- probabilidades / sum(probabilidades)
+
+# Generar 100 números aleatorios con la pmf dada
+numeros_aleatorios <- sample(k, size = 100, replace = TRUE, prob = probabilidades)
+
+f <- data.frame(numeros_aleatorios)
+
+# Crear un histograma de los números aleatorios
+ggplot(f, aes(numeros_aleatorios)) +
+  geom_histogram(binwidth = 1, fill = "steelblue", color = "black") +
+  labs(x = "Números Aleatorios", y = "Frecuencia", title = "Histograma de Números Aleatorios")
+
+```
+
+
+b. $p_X(k) = \frac{k^2}{2870}, \;\; k=0,1,2,3,\ldots, 19, 20$
+
+
+```{r b1}
+k <- 0:20
+probabilidades <- (k^2) / 2870
+
+# Normalizar las probabilidades para que sumen 1
+probabilidades <- probabilidades / sum(probabilidades)
+
+# Generar 100 números aleatorios con la pmf dada
+numeros_aleatorios <- sample(k, size = 100, replace = TRUE, prob = probabilidades)
+
+df <- data.frame(numeros_aleatorios)
+
+# Crear un histograma de los números aleatorios
+ggplot(df, aes(numeros_aleatorios)) +
+  geom_histogram(binwidth = 1, fill = "steelblue", color = "black") +
+  labs(x = "Números Aleatorios", y = "Frecuencia", title = "Histograma de Números Aleatorios")
+
+```
+c. $p_X(k) = \log_{10}\left(\frac{k+1}{k}\right)\; \; k=1,2,3, \ldots 9$
+```{r c1}
+k <- 1:9
+probabilidades <- log10((k+1) / k)
+
+# Normalizar las probabilidades para que sumen 1
+probabilidades <- probabilidades / sum(probabilidades)
+
+# Generar 100 números aleatorios con la pmf dada
+numeros_aleatorios <- sample(k, size = 100, replace = TRUE, prob = probabilidades)
+
+df <- data.frame(numeros_aleatorios)
+
+# Crear un histograma de los números aleatorios
+ggplot(df, aes(numeros_aleatorios)) +
+  geom_histogram(binwidth = 1, fill = "steelblue", color = "black") +
+  labs(x = "Números Aleatorios", y = "Frecuencia", title = "Histograma de Números Aleatorios")
+```
+
+
+
+3. La variable aleatoria binomial depende de los parámetros $n$ y $p$. Grafique las pmfs y cdfs para (Nota para graficar por parejas puede usar el comando `par(mfrow=(filas, columnas))`) y responda las preguntas:
+ a. $n=10$ y $p=1/2$
+```{r a2}
+n <- 10   # Número de ensayos
+p <- 0.5  # Probabilidad de éxito
+
+# Crear un dataframe con la distribución binomial
+df <- data.frame(x = 0:n)
+df$pmf <- dbinom(df$x, size = n, prob = p)
+df$cdf <- pbinom(df$x, size = n, prob = p)
+
+par(mfrow = c(1, 2))
+
+# Graficar la pmf
+ggplot(df, aes(x, pmf)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(x = "X", y = "P(X)", title = "Función de Masa de Probabilidad")
+
+# Graficar la cdf
+ggplot(df, aes(x, cdf)) +
+  geom_line(color = "steelblue") +
+  labs(x = "X", y = "P(X)", title = "Función de Distribución Acumulativa")
+
+```
+ 
+ 
+ b. $n=10$ y $p=1/8$
+ 
+```{r b2}
+n <- 10   # Número de ensayos
+p <- 1/8  # Probabilidad de éxito
+
+# Crear un dataframe con la distribución binomial
+df <- data.frame(x = 0:n)
+df$pmf <- dbinom(df$x, size = n, prob = p)
+df$cdf <- pbinom(df$x, size = n, prob = p)
+
+# Graficar la pmf y la cdf en un solo gráfico
+par(mfrow = c(1, 2))
+
+# Graficar la pmf
+ggplot(df, aes(x, pmf)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(x = "X", y = "P(X)", title = "Función de Masa de Probabilidad")
+
+# Graficar la cdf
+ggplot(df, aes(x, cdf)) +
+  geom_line(color = "steelblue") +
+  labs(x = "X", y = "P(X)", title = "Función de Distribución Acumulativa")
+
+```
+ 
+ c. $n=10$ y $4/5$
+ 
+```{r c2}
+n <- 10   # Número de ensayos
+p <- 4/5  # Probabilidad de éxito
+
+# Crear un dataframe con la distribución binomial
+df <- data.frame(x = 0:n)
+df$pmf <- dbinom(df$x, size = n, prob = p)
+df$cdf <- pbinom(df$x, size = n, prob = p)
+
+# Graficar la pmf y la cdf en un solo gráfico
+par(mfrow = c(1, 2))
+
+# Graficar la pmf
+ggplot(df, aes(x, pmf)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(x = "X", y = "P(X)", title = "Función de Masa de Probabilidad")
+
+# Graficar la cdf
+ggplot(df, aes(x, cdf)) +
+  geom_line(color = "steelblue") +
+  labs(x = "X", y = "P(X)", title = "Función de Distribución Acumulativa")
+
+```
+ 
+ 
+ 
+ d. $n=10$ y $p=1/2$
+```{r d2}
+n <- 10   # Número de ensayos
+p <- 1/2  # Probabilidad de éxito
+
+# Crear un dataframe con la distribución binomial
+df <- data.frame(x = 0:n)
+df$pmf <- dbinom(df$x, size = n, prob = p)
+df$cdf <- pbinom(df$x, size = n, prob = p)
+
+# Graficar la pmf y la cdf en un solo gráfico
+par(mfrow = c(1, 2))
+
+# Graficar la pmf
+ggplot(df, aes(x, pmf)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  labs(x = "X", y = "P(X)", title = "Función de Masa de Probabilidad")
+
+# Graficar la cdf
+ggplot(df, aes(x, cdf)) +
+  geom_line(color = "steelblue") +
+  labs(x = "X", y = "P(X)", title = "Función de Distribución Acumulativa")
+
+```
+ 
+ 
+ c. ¿Tiene algún efecto $n$ y $p$ para que la pmf sea simétrica?
+ binomial pueden afectar la simetría de la función de masa de probabilidad (pmf) 
+ ¿Cuál? Cuando p=0.5, la distribución binomial será asimétrica. Si p<0.5, la distribución estará sesgada hacia la derecha, lo que significa que es más probable obtener menos éxitos que el promedio. Si p>0.5, la distribución estará sesgada hacia la izquierda, lo que significa que es más probable obtener más éxitos que el promedio.
+ 
+ d. ¿Qué efecto tiene $p$ en la asimetría?
+ 
+ El parámetro p en una distribución binomial tiene un efecto significativo en la asimetría de la distribución.
+ 
+- Cuando p=0.5, la distribución es simétrica, lo que significa que los valores a ambos lados del valor medio tienen la misma probabilidad.
+- Cuando p<0.5, la distribución está sesgada hacia la derecha, lo que significa que los valores menores tienen una mayor probabilidad.
+- Cuando p>0.5, la distribución está sesgada hacia la izquierda, lo que significa que los valores mayores tienen una mayor probabilidad.
+ 
+ 
+
+# Variables aletorias continuas
+
+Las variables aleatorias continuas, a diferencia de las discretas, quedan totalmente definidas mediante su PDF y CDF. Existen múltiples variables aleatorias bien conocidas y que sirven para modelar diversos fenómenos. La densidad Gamma está dada por la siguiente ecuación:
+$$
+f_X(x, \alpha, \beta) = \begin{cases}
+\frac{\beta^{\alpha}}{\Gamma(\alpha)} x^{\alpha-1} \mbox{e}^{-\beta x} & x>0\\
+0 & x\le 0
+\end{cases}
+$$
+donde $\alpha>0$ y $\beta >0$.
+
+## Actividad
+1. ¿Qué efecto tiene incrementar $\alpha$? Grafique para contestar.
+
+```{r df}
+x <- seq(0, 20, length.out = 100)
+
+# Definir los valores de alpha y beta
+alpha_values <- c(1, 2, 3, 5)
+beta <- 1
+
+# Crear un dataframe para cada valor de alpha
+df_list <- lapply(alpha_values, function(alpha) {
+  df <- data.frame(x = x)
+  df$alpha <- alpha
+  df$beta <- beta
+  df$pdf <- dgamma(x, shape = alpha, rate = beta)
+  return(df)
+})
+
+# Combinar todos los dataframes en uno solo
+df <- do.call(rbind, df_list)
+
+# Graficar la pdf para cada valor de alpha
+ggplot(df, aes(x, pdf, color = factor(alpha))) +
+  geom_line() +
+  labs(x = "X", y = "f_X(x)", color = "Alpha", 
+       title = "Función de Densidad de Probabilidad de una Distribución Gamma")
+
+```
+
+2. ¿Qué efecto tiene $\beta$ en la forma de la densidad? Grafique para contestar.
+
+
+
+
+
+Otra variable aleatoria de interés es la variable aleatoria de Cauchy que está definida de la siguiente manera:
+
+$$
+f_X(x) = \frac{\beta}{\pi ([x-\alpha]^2 + \beta^2)}
+$$
+donde $\alpha \in \mathbb{R}$ y $\beta >0$. Supógamos que $\alpha = 5$.
+
+## Actividad
+
+1. ¿Qué efecto tiene $\beta$ en la función de densidad? Grafique para contestar.
+
+```{r densidad}
+df <- data.frame(x = seq(-10, 20, length.out = 1000))
+
+alpha <- 5
+
+ggplot(df, aes(x = x)) +
+  stat_function(fun = dcauchy, args = list(location = alpha, scale = 1), aes(colour = "β=1")) +
+  stat_function(fun = dcauchy, args = list(location = alpha, scale = 2), aes(colour = "β=2")) +
+  stat_function(fun = dcauchy, args = list(location = alpha, scale = 3), aes(colour = "β=3")) +
+  stat_function(fun = dcauchy, args = list(location = alpha, scale = 4), aes(colour = "β=4")) +
+  stat_function(fun = dcauchy, args = list(location = alpha, scale = 5), aes(colour = "β=5")) +
+  labs(title='Distribución de Cauchy para diferentes valores de β', x='x', y='Densidad de probabilidad', colour='Parámetro') +
+  theme_minimal()
+
+```
+
+
+
+
+Supóngamos que tenemos la siguiente PDF:
+$$
+f_X(x) = \begin{cases}
+0 & x < a\\
+\frac{2(x-a)}{(b-a)(c-a)} & a \le x < c\\
+\frac{2}{b-a} & x=c\\
+\frac{2(b-x)}{(b-a)(b-c)} & c < x \le b\\
+0 & b < x
+\end{cases}
+$$
+donde $a < c < c$.
+
+## Actividad
+1. Grafique la densidad triangular cuando $a=0$, $b=4$, $c=2$
+
+```{r ds}
+
+df <- data.frame(x = seq(0, 4, length.out = 1000))
+
+a <- 0
+b <- 4
+c <- 2
+
+ggplot(df, aes(x = x)) +
+  stat_function(fun = function(x) {
+    ifelse(x < a, 0,
+           ifelse(x < c, 2*(x-a)/((b-a)*(c-a)),
+                  ifelse(x <= b, 2*(b-x)/((b-a)*(b-c)), 0)))
+  }, aes(colour = "Densidad triangular")) +
+  labs(title='Densidad triangular para a=0, b=4, c=2', x='x', y='Densidad de probabilidad', colour='Parámetro') +
+  theme_minimal()
+
+```
+
+2. Grafique la densidad triangular cuando $a=1$, $c=2$, $b=4$
+
+```{r sdf}
+df <- data.frame(x = seq(0, 4, length.out = 1000))
+
+a <- 1
+b <- 4
+c <- 2
+
+ggplot(df, aes(x = x)) +
+  stat_function(fun = function(x) {
+    ifelse(x < a, 0,
+           ifelse(x < c, 2*(x-a)/((b-a)*(c-a)),
+                  ifelse(x <= b, 2*(b-x)/((b-a)*(b-c)), 0)))
+  }, aes(colour = "Densidad triangular")) +
+  labs(title='Densidad triangular para a=1, b=4, c=2', x='x', y='Densidad de probabilidad', colour='Parámetro') +
+  theme_minimal()
+
+```
+
+3. Grafique la densidad triangular cuando $a=-1$, $c=0$, $b=1$
+```{r mn}
+df <- data.frame(x = seq(0, 4, length.out = 1000))
+
+a <- -1
+b <- 1
+c <- 0
+
+ggplot(df, aes(x = x)) +
+  stat_function(fun = function(x) {
+    ifelse(x < a, 0,
+           ifelse(x < c, 2*(x-a)/((b-a)*(c-a)),
+                  ifelse(x <= b, 2*(b-x)/((b-a)*(b-c)), 0)))
+  }, aes(colour = "Densidad triangular")) +
+  labs(title='Densidad triangular para a=-1, b=1, c=0', x='x', y='Densidad de probabilidad', colour='Parámetro') +
+  theme_minimal()
+
+```
+
+
+
+Tanto `R` como `python` nos permiten calcular integrales usando los comandos básicos o bién usando sistemas de cómputo algebraíco. R, por ejemplo, puede utilizar un sistema llamado `Ryacas` que permite hacer muchos cálculos de forma simbólica. Ahora, consideremos que tenemos la siguiente PDF:
+
+$$
+f_X(x) = \begin{cases}
+\mbox{e}^{-x} & x \ge 0\\
+0 & \mbox{resto}
+\end{cases}
+$$
+
+## Actividad
+
+Calcular, usando los comando de integración o `Ryacas` o `python` las siguientes probabilidades usando la PDF de arriba:
+
+1. $P(X>1)$
+```{r vf}
+library(Ryacas)
+
+# Definir la función
+f <- function(x) exp(-x)
+
+# Calcular la integral
+result <- integrate(f, lower = 1, upper = Inf)
+print(result$value)
+```
+
+2. $P(2 < X \le 4)$
+```{r hgjn}
+f <- function(x) exp(-x)
+
+# Calcular la integral
+result <- integrate(f, lower = 2, upper = 4)
+print(result$value)
+
+```
+
+
+3. $P(X \le 2)$
+```{r xcsd}
+f <- function(x) exp(-x)
+
+# Calcular la integral
+result <- integrate(f, lower = 0, upper = 2)
+print(result$value)
+
+```
+
+
+
+Finalmente, supongamos que tenemos la siguiente PDF:
+
+$$
+f_X(x) = \frac{1}{\sqrt{2\pi}}\mbox{e}^{-\frac{(x-3)^2}{2}}
+$$
+
+## Actividad
+
+1. Graficar $f_X(3+x)$.
+```{r bcnf}
+f <- function(x) dnorm(3 + x, mean = 3, sd = 1)
+
+# Crear un data frame con los valores de x
+df <- data.frame(x = seq(-10, 10, length.out = 1000))
+
+# Graficar la función
+ggplot(df, aes(x = x)) +
+  stat_function(fun = f, aes(colour = "f_X(3+x)")) +
+  labs(title='Función f_X(3+x)', x='x', y='Densidad de probabilidad', colour='Parámetro') +
+  theme_minimal()
+
+```
+
+
+2. Graficar $f_X(3-x)$.
+```{r shgdab}
+f <- function(x) dnorm(3 - x, mean = 3, sd = 1)
+
+# Crear un data frame con los valores de x
+df <- data.frame(x = seq(-10, 10, length.out = 1000))
+
+# Graficar la función
+ggplot(df, aes(x = x)) +
+  stat_function(fun = f, aes(colour = "f_X(3-x)")) +
+  labs(title='Función f_X(3-x)', x='x', y='Densidad de probabilidad', colour='Parámetro') +
+  theme_minimal()
+
+```
+
+3. Que hay en común entre estas dos gráficas y qué se puede inferir de $f_X(3+x)$ y $f_X(3-x)$
+
+La función fX​(3+x) representa un desplazamiento hacia la izquierda de la funcion original. Esto se debe a que al valor de x se le suma una constante, lo que resulta en un desplazamiento hacia la izquierda en el eje x.
+
+Por otro lado, la función fX.(3−x) representa un desplazamiento hacia la derecha de la funcion original. Esto se debe a que al valor de x se le resta una constante , lo que resulta en un desplazamiento hacia la derecha en el eje x.
+
+## Fecha de entrega: miércoles 18 de octubre de 2023 a través de Moodle. 
