@@ -1,0 +1,244 @@
+---
+title: "AFDMD-111 - Estadística"
+subtitle: "Distribuciones muestrales"
+author: "Juan Pablo Chan Hau"
+date: "27/11/2023"
+output:
+  rmdformats::material:
+    highlight: kate
+    cards: false
+---
+
+
+```{r knitr_init, echo=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+
+
+# Distribuciones muestrales de la media
+
+En esta práctica  abordaremos el tema de la distribución muestral de la media para diversas distribuciones de probabilidad y veremos como éstas se ajustan a una distribución de probabilidad normal o Gaussiana como la que se muestra en la ecuación,
+
+$$
+f_X(x) = \frac{1}{\sqrt{2\pi \sigma^2}} \mbox{e}^{-\frac{-(x-\mu)^2}{2\sigma^2}}
+$$
+
+Antes de iniciar, es necesario que nos familiaricemos con los siguientes comandos:
+
+```{r}
+help(hist)
+help(qqnorm)
+help(qqline)
+
+```
+
+para ello podemos hacer `help(comando)` y obtener ayuda sobre cada uno de ellos. Ahora responda lo siguiente.
+
+1. ¿Cuál es la función del comando `qqnorm`?.
+La función qqnorm() en R se utiliza para crear un gráfico Q-Q (quantile-quantile) de los datos. Un gráfico Q-Q es una herramienta gráfica que ayuda a evaluar si un conjunto de datos se distribuye aproximadamente de manera normal.
+
+Los gráficos Q-Q trazan los cuantiles de los datos contra los cuantiles de una distribución normal estándar. Si los datos se distribuyen normalmente, los puntos en el gráfico Q-Q seguirán aproximadamente una línea recta.
+
+La función qqnorm() toma como argumento principal un vector numérico de datos. También puedes especificar argumentos adicionales para cambiar el título del gráfico, los nombres de los ejes y otros aspectos del gráfico.
+
+2. ¿Cuál es la función del comando `qqline`? ¿y de `hist`?.
+
+La función qqline() en R agrega una línea de referencia a un gráfico Q-Q normal, que es útil para comparar visualmente los datos con una distribución normal estándar. Si los datos se distribuyen normalmente, los puntos en el gráfico Q-Q seguirán aproximadamente esta línea.
+
+hist() en R se utiliza para crear un histograma, que es un gráfico que muestra la distribución de frecuencias de un conjunto de datos continuos. El eje x representa los intervalos de datos y el eje y representa la frecuencia de los datos en cada intervalo.
+
+
+## Aplicación de `qqnorm` y `qqline`
+
+Veamos ahora la aplicación de `qqnorm` y `qqline` en un ejemplo práctico. Supóngamos que queremos verificar si los datos se ajustan a una distribución normal, entonces para hacerlo, aplicamos,
+
+```{r}
+datos <- rnorm(100, mean = 10)
+qqnorm(datos)
+qqline(datos)
+```
+
+Actividad.
+
+1. Ahora cambie los nombres de los ejes $x$, $y$ y del título del gráfico anterior.
+```{r nombre}
+datos <- rnorm(100, mean = 10)
+qqnorm(datos, main = "Grafica", xlab = "Tu eje x", ylab = "Tu eje y")
+qqline(datos)
+
+```
+
+
+2. ¿Qué sucede si la longitud de los datos es pequeña, digamos 10, 20 (modifique `rnorm`)?
+
+Si la longitud de los datos es pequeña, la grafica puede no seguir tan de cerca la línea de referencia, ya que hay menos puntos para estimar la distribución.
+
+```{r log}
+datos <- rnorm(10, mean = 10)
+qqnorm(datos)
+qqline(datos)
+
+```
+
+3. ¿Qué sucede si los datos tienen varianza grande? ¿En qué parte del gráfico Q-Q se puede ver la varianza grande?
+
+Si los datos tienen una varianza grande, los puntos en el gráfico se dispersarán más lejos de la línea de referencia. Esto se puede ver en todas las partes de la gráfica.
+```{r varianza}
+datos <- rnorm(100, mean = 10, sd = 20)
+qqnorm(datos)
+qqline(datos)
+
+
+```
+
+4. ¿Y si cambiamos la media?
+Si cambiamos la media, todos los puntos en el gráfico se desplazarán hacia arriba o hacia abajo, pero la forma general del gráfico no cambiará.
+
+```{r media}
+datos <- rnorm(100, mean = 20)
+qqnorm(datos)
+qqline(datos)
+
+```
+
+5. ¿Qué sucede si los datos son exponenciales?
+Si los datos son exponenciales, en la gráfica no seguirá la línea de referencia, ya que la distribución exponencial no es normal. En su lugar, los puntos formarán una curva.
+
+```{r ex}
+datos <- rexp(100, rate = 1/10)
+qqnorm(datos)
+qqline(datos)
+
+```
+
+## Aplicación de `hist`
+
+El comando `hist` permite obtener el histograma de una serie de datos. El histograma, de igual forma que el gráfico Q-Q permite ajustar una serie de datos a una distribución para saber qué tanto se parece a la densidad teórica. Veamos cómo se aplica.
+
+
+
+```{r}
+datos <- rnorm(1000) #1000 muestras de una densidad normal
+hist(datos)
+
+```
+
+Podemos ver en el gráfico del histograma que éste es similar al gráfico de la densidad. El siguiente código lo muestra:
+
+
+```{r}
+datos <- rnorm(1000) # muestras normales con media 0 y var 1.
+teorica <- dnorm(seq(-4,4, length=100),mean = 0, sd = 1)
+hist(datos,freq = FALSE)
+lines(seq(-4,4, length=100),teorica, col="red")
+```
+
+Actividades.
+
+1. ¿Qué sucede si el número de muestras es pequeño (muestrelo mediante código y gráficas)?
+Si el número de muestras es pequeño, el histograma puede no representar con precisión la verdadera distribución de los datos
+
+```{r ee}
+datos <- rnorm(10)
+teorica <- dnorm(seq(-4,4, length=100),mean = 0, sd = 1)
+hist(datos,freq = FALSE)
+lines(seq(-4,4, length=100),teorica, col="red")
+
+```
+
+2. ¿Y si cambio la varianza? ¿Tiene algún efecto la varianza grande? Mostrar con código.
+
+Si cambias la varianza, cambiará la forma del histograma y la línea teórica. Una varianza más grande hará que los datos se dispersen más.
+
+```{r cb}
+
+datos <- rnorm(1000, sd = 2)
+teorica <- dnorm(seq(-4,4, length=100),mean = 0, sd = 2)
+hist(datos,freq = FALSE)
+lines(seq(-4,4, length=100),teorica, col="red")
+
+```
+
+
+3. ¿Cuáles crees que son las ventajas y desventajas del histograma y el gráfico Q-Q?
+
+*Histograma:
+**Ventajas: Fácil de entender, muestra la distribución de los datos, útil para grandes conjuntos de datos.
+**Desventajas: Sensible al número de bins, no muestra si los datos siguen una distribución específica.
+
+* Gráfico Q-Q:
+**Ventajas: Muestra si los datos siguen una distribución específica, menos sensible a la elección de parámetros.
+**Desventajas: Más difícil de entender, no muestra la distribución de los datos.
+
+
+# Aplicación de la distribución muestral de la media.
+
+El término distribución muestral de la media se refiera a la distribución (ajustada mediante el gráfico Q-Q o el histograma) de la media muestral de un  conjunto de datos. Por ejemplo,
+
+```{r}
+N <- 10 # número de medias (es decir número de muestras)
+M <- 100 # número de la longitud de cada serie de datos
+medias <- numeric(N) # Vector que guardará las medias
+
+for(i in 1:N)
+{
+  datos <- rnorm(M)
+  medias[i] <- mean(datos)
+  
+}
+hist(medias)
+qqnorm(medias)
+qqline(medias)
+```
+
+
+Actividad
+
+1. ¿Qué sucede si hago N grande, por ejemplo 100, 1000, 10000?
+
+Si haces N grande (por ejemplo, 100, 1000, 10000), estás aumentando el número de muestras que estás tomando. Como resultado, las medias de tus muestras se distribuirán más estrechamente alrededor de la media de la población de la que estás tomando las muestras.
+
+```{r ncn}
+N <- 10000 # número de medias (es decir número de muestras)
+M <- 100 # número de la longitud de cada serie de datos
+medias <- numeric(N) # Vector que guardará las medias
+
+for(i in 1:N)
+{
+  datos <- rnorm(M)
+  medias[i] <- mean(datos)
+  
+}
+hist(medias)
+qqnorm(medias)
+qqline(medias)
+
+
+```
+
+2. ¿Qué sucede si en lugar de tomar una muestra Gaussiana, tomo una muestra exponencial con N muy grande?
+
+Si tomas una muestra exponencial con N muy grande, la distribución de las medias de las muestras aún se aproximará a una distribución normal debido al Teorema del Límite Central. Sin embargo, la distribución de los datos individuales no será normal, será exponencial.
+
+```{r nncnc}
+N <- 10000 # número de medias (es decir número de muestras)
+M <- 100 # número de la longitud de cada serie de datos
+medias <- numeric(N) # Vector que guardará las medias
+
+for(i in 1:N)
+{
+  datos <- rexp(M, rate = 1/10)
+  medias[i] <- mean(datos)
+  
+}
+hist(medias)
+qqnorm(medias)
+qqline(medias)
+
+```
+
+
+
+## Fecha de entrega: Miércoles 29 de Noviembre de 2023 ha las 16:00HRS 
+
