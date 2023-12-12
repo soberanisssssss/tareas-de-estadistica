@@ -1,0 +1,75 @@
+---
+title: "Informe sobre la Función Seno"
+author: "edward roberto cauich soberanis"
+date: "06/09/2023"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+  word_document: default
+---
+
+# Introducción
+
+La función seno, denotada como \( \sin(x) \), es una función trigonométrica fundamental en matemáticas. Representa la relación entre el lado opuesto y la hipotenusa en un triángulo rectángulo en un círculo unitario. A continuación, se presenta una descripción de algunas características clave de la función seno.
+
+
+## Definición Matemática
+
+La función seno se define como la razón entre el lado opuesto y la hipotenusa en un triángulo rectángulo. Matemáticamente, se expresa como:
+
+\[
+\sin(x) = \frac{\text{opuesto}}{\text{hipotenusa}}
+\]
+
+## Periodicidad
+
+La función seno es periódica con un período de \(2\pi\) radianes (360 grados).
+
+## Rango
+
+Los valores de la función seno oscilan entre -1 y 1, lo que significa que su rango es \([-1, 1]\).
+
+## Oscilación Periódica
+
+La función seno describe un comportamiento oscilatorio y se utiliza para modelar fenómenos oscilatorios en diversas disciplinas.
+
+# Tabla de Valores de la Función Seno
+
+A continuación, se presenta una tabla de valores de la función seno para ángulos en radianes:
+
+| \(x\) (radianes) | \(\sin(x)\) |
+|-------------------|------------|
+| 0                 | 0          |
+| \(\frac{\pi}{6}\) | 0.5        |
+| \(\frac{\pi}{4}\) | 0.7071     |
+| \(\frac{\pi}{3}\) | 0.866      |
+| \(\frac{\pi}{2}\) | 1          |
+| \(\pi\)           | 0          |
+| \(\frac{3\pi}{2}\) | -1         |
+| \(2\pi\)          | 0          |
+
+
+
+
+
+
+
+
+# Gráfico de la Función Seno
+
+```{r, echo=FALSE}
+# Código R para graficar la función seno
+library(ggplot2)
+
+x <- seq(0, 2 * pi, length.out = 100)
+y <- sin(x)
+
+df <- data.frame(x, y)
+
+ggplot(df, aes(x, y)) +
+  geom_line() +
+  labs(title = "Gráfico de la función seno",
+       x = "Ángulo (radianes)",
+       y = "Valor de sen(x)") +
+  theme_minimal()
