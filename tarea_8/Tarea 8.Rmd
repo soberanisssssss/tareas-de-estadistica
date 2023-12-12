@@ -1,0 +1,289 @@
+---
+title: "Estadística"
+subtitle: "Aplicaciones de los momentos: entropía diferencial 2"
+author: "edward roberto cauich soberanis"
+date: "13/11/2023"
+output:
+  rmdformats::material:
+    highlight: kate
+    cards: false
+---
+
+
+```{r knitr_init, echo=FALSE, message=FALSE, warning=FALSE}
+library(highcharter)
+```
+
+
+
+# Entropía diferencial
+
+Sea $f(x)$ la densidad de probabilidad de un experimento aleatorio $\mathbb{E}$. Recordemos que la entropía de la función $f(x)$ (llamada entropía diferencial) está dada por la siguiente expresión:
+$$
+h(X) = -\int_{-\infty}^{+\infty}{f(x)\log(f(x))}.
+$$
+
+La entropía diferencial es pues, la entropía de Shannon para distribuciones que corresponden a variables aleatorias continuas, por ejemplo para la variable aleatoria uniforme, como se vió en la tarea pasada, la entropía tiene la siguiente relación densidad-entropía:
+$$
+h(f(x)=\frac{1}{b-a}) = \ln(b-a)
+$$
+
+y por lo tanto se puede notar que para el caso de la distribución uniforme al incrementar la varianza (cuando $a$ incrementa), se incrementa la entropía. La siguiente figura muestra lo anterior.
+
+```{r eval=TRUE}
+a          <- 0
+b          <- seq(2,8, length=20)               # Variamos b
+entropy    <- log(b-a) 
+hc <- highchart() %>% 
+  hc_add_series(cbind(b,entropy), name="UniformRV_entropy") %>%   hc_add_theme(hc_theme_smpl()) %>% 
+  hc_title(text="Variacion de la entropia con la Varianza") %>%   hc_subtitle(text="Teoria de la informacion") %>%
+  hc_xAxis(title=list(text="Valores de b")) %>%          hc_yAxis(title=list(text="Entropia de la funcion"))
+hc
+
+```
+
+## Ejercicios
+
+Investigar la relación varianza-entropia para las siguientes variables aleatorias continuas:
+
+###Rayleigh
+En la teoría de la probabilidad y estadística, la distribución de Rayleigh es una función de distribución continua. Se suele presentar cuando un vector bidimensional (por ejemplo, el que representa la velocidad del viento) tiene sus dos componentes, ortogonales, independientes y siguen una distribución normal. Su valor absoluto seguirá entonces una distribución de Rayleigh. Esta distribución también se puede presentar en el caso de números complejos con componentes real e imaginaria independientes y siguiendo una distribución normal. Su valor absoluto sigue una distribución de Rayleigh.
+
+Varianza:
+$$
+\sigma^2 = \frac{4-\pi}{2}\sigma^2
+$$
+Entropia:
+$$
+h = 1 + \ln\left(\frac{\sigma}{\sqrt{2}}\right) + \frac{\gamma}{2}
+$$
+
+### Normal
+En estadística y probabilidad se llama distribución normal, distribución de Gauss, distribución gaussiana, distribución de Laplace-Gauss o normalidad estadística a una de las distribuciones de probabilidad de variable continua que con más frecuencia aparece en estadística y en la teoría de probabilidades.
+
+La gráfica de su función de densidad tiene una forma acampanada y es simétrica respecto de un determinado parámetro estadístico. Esta curva se conoce como campana de Gauss y es el gráfico de una función gaussiana.
+
+Varianza:
+$$
+\sigma^2
+
+$$
+Entropia:
+$$
+\frac{1}{2} \ln(2 \pi e \sigma^2)
+$$
+
+### Exponencial
+En otras palabras, la distribución normal adapta una variable aleatoria a una función que depende de la media y la desviación típica. Es decir, la función y la variable aleatoria tendrán la misma representación pero con ligeras diferencias.
+
+Una variable aleatoria continua puede tomar cualquier número real. Por ejemplo, las rentabilidades de las acciones, los resultados de un examen, el coeficiente de inteligencia IQ y los errores estándar son variables aleatorias continuas.
+
+Una variable aleatoria discreta toma valores naturales. Por ejemplo, el número de estudiantes en una universidad
+
+Varianza:
+$$
+\frac{1}{\lambda^2}
+$$
+Entropia:
+$$
+1 - \ln(\lambda)
+$$
+
+###Cauchy
+
+La distribución de Cauchy es una distribución continua que se define por sus parámetros de ubicación y escala.
+
+Utilice la distribución de Cauchy para probar qué tan bien funcionan las técnicas robustas bajo diversos supuestos de distribución. La distribución de Cauchy se utiliza frecuentemente en física.
+La distribución de Cauchy se representa con una curva en forma de campana, similar a una distribución normal, como lo ilustran las siguientes gráficas. Sin embargo, en la distribución de Cauchy, las colas se aproximan a cero con mayor lentitud que las colas de la distribución normal. 
+
+Esta distribución no tiene ni media ni varianza definidas. Sin embargo, su entropía es:
+$$
+\ln(4 \pi \gamma)
+$$
+
+
+### Laplace
+Utilice la distribución de Laplace cuando la distribución de los datos tenga un pico más alto que una distribución normal. Por ejemplo, la distribución de Laplace se utiliza para modelar datos en aplicaciones en biología, finanzas y economía.
+La distribución de Laplace es una distribución continua que se define por sus parámetros de ubicación y escala. En la siguiente gráfica, la distribución de Laplace se representa con la línea discontinua y la distribución normal se representa con la línea continua. 
+
+Varianza:
+$$
+2b^2
+$$
+Entropia:
+$$
+\ln(2be)
+$$
+
+###Logística
+
+La distribución logística es una distribución continua que se define por sus parámetros de escala y ubicación. La distribución logística no tiene parámetro de forma, lo que significa que la función de densidad de probabilidad solo tiene una forma. La forma de la distribución logística es similar a la forma de la distribución normal. Sin embargo, la distribución logística tiene colas más grandes.
+
+Varianza:
+$$
+\frac{s^2 \pi^2}{3}
+$$
+Entropia:
+$$
+\ln(s) + 2
+$$
+
+###Triangular
+
+La distribución triangular es una distribución de probabilidad continua con una función de densidad de probabilidad con forma de triángulo.
+
+Está definido por tres valores:
+
+*El valor mínimo a
+*El valor máximo b
+*El valor pico c
+
+El nombre de la distribución proviene del hecho de que la función de densidad de probabilidad tiene forma de triángulo.
+Resulta que esta distribución es extremadamente útil en el mundo real porque a menudo podemos estimar el valor mínimo (a), el valor máximo (b) y el valor más probable (c) que tomará una variable aleatoria , por lo que A menudo puede modelar el comportamiento de variables aleatorias mediante el uso de una distribución triangular con el conocimiento de estos tres valores.
+
+Varianza:
+$$
+\frac{(b - a)^2}{24}
+$$
+Entropia:
+$$
+\frac{1}{2} + \ln \left(\frac{b - a}{2}\right)
+$$
+
+
+Para la variable aleatoria triangular, ?Existe una relación entre su moda y su entropía?
+
+Nota: Para responder adecuadamente los anteriores cuestionamientos es necesario investigar las entropías de las variables aleatorias así como los valores de sus varianzas. De igual forma es necesario conocer el funcionamiento del paquete de `R` llamado `highcharter`.
+
+
+# Entropía de Shannon discreta
+
+La entropía mide el grado de complejidad de una variable aleatoria descrita por medio de su PDF o bién mediante su PMF. Para el caso discreto, la ecuación entrópica de Shannon está dada por:
+$$
+H(p) = -\sum_{k}{p_k \log(p_k)}
+$$
+
+Para la variable aleatoria Binomial, la PMF está dada por:
+$$
+\mbox{Pr}\{X=k\} = {n\choose k} p^k(1-p)^{n-k}
+$$
+y por lo tanto, la relación entre la entropía y la probabilidad $p$ está dada empíricamente como:
+
+```{r eval=TRUE}
+n          <- 20
+x          <- 0:20
+p          <- seq(0,1, length=20)
+entropies  <- numeric(20)
+for(i in 1:length(p))
+{
+  densities     <- dbinom(x,n,p[i])
+  entropies[i]  <- -1*sum(densities*log(densities))
+  
+}
+theoretical <- 0.5*log(2*pi*n*exp(1)*p*(1-p))
+hc <- highchart() %>% 
+  hc_add_series(cbind(p,entropies), name="BinomialRV_empirical") %>%  hc_add_series(cbind(p,theoretical), name="BinomialRV_theoretical") %>%  hc_add_theme(hc_theme_smpl()) %>% 
+  hc_title(text="Variacion de la entropia contra p") %>%   hc_subtitle(text="Teoria de la informacion") %>%
+  hc_xAxis(title=list(text="Valores de probabilidad p")) %>%          hc_yAxis(title=list(text="Entropia de la funcion"))
+hc
+
+```
+
+## Ejercicios
+
+Replicar el mismo procedimiento anterior para las siguientes variables aleatorias discretas:
+
+### Binomial negativa.
+```{r Binomial negativa}
+library(dplyr)
+library(magrittr)
+library(highcharter)
+n <- 20
+x <- 0:20
+p <- seq(0,1, length=20)
+entropies <- numeric(20)
+for(i in 1:length(p)) {
+  densities <- dnbinom(x, size=n, prob=p[i])
+  entropies[i] <- -1*sum(densities*log(densities))
+}
+hc <- highchart() %>% 
+  hc_add_series(cbind(p,entropies), name="NegativeBinomialRV") %>% 
+  hc_add_theme(hc_theme_smpl()) %>% 
+  hc_title(text="Variacion de la entropia contra p") %>%   
+  hc_xAxis(title=list(text="Valores de probabilidad p")) %>%          
+  hc_yAxis(title=list(text="Entropia de la funcion"))
+
+hc
+
+```
+
+### Geométrica.
+```{r geometrica}
+n <- 20
+x <- 0:20
+p <- seq(0,1, length=20)
+entropies <- numeric(20)
+for(i in 1:length(p)) {
+  densities <- dgeom(x, prob=p[i])
+  entropies[i] <- -1*sum(densities*log(densities))
+}
+hc <- highchart() %>% 
+  hc_add_series(cbind(p,entropies), name="GeometricRV") %>% 
+  hc_add_theme(hc_theme_smpl()) %>% 
+  hc_title(text="Variacion de la entropia contra p") %>%   
+  hc_xAxis(title=list(text="Valores de probabilidad p")) %>%          
+  hc_yAxis(title=list(text="Entropia de la funcion"))
+hc
+
+
+```
+
+###Poisson.
+```{r Poisson}
+lambda <- seq(0,20, length=20)
+x <- 0:20
+entropies <- numeric(20)
+for(i in 1:length(lambda)) {
+  densities <- dpois(x, lambda=lambda[i])
+  entropies[i] <- -1*sum(densities*log(densities))
+}
+hc <- highchart() %>% 
+  hc_add_series(cbind(lambda,entropies), name="PoissonRV") %>% 
+  hc_add_theme(hc_theme_smpl()) %>% 
+  hc_title(text="Variacion de la entropia contra lambda") %>%   
+  hc_xAxis(title=list(text="Valores de lambda")) %>%          
+  hc_yAxis(title=list(text="Entropia de la funcion"))
+hc
+
+```
+
+###Hipergeométrica.
+```{r hipergeometrica}
+
+library(dplyr)
+library(magrittr)
+library(highcharter)
+
+m <- 50
+n <- 20
+k <- seq(0,50, length=20)
+entropies <- numeric(20)
+epsilon <- 1e-10 
+
+for(i in 1:length(k)) {
+  densities <- dhyper(x, m=m, n=n, k=k[i])
+  entropies[i] <- -1*sum((densities+epsilon)*log(densities+epsilon)) 
+}
+
+hc <- highchart() %>% 
+  hc_add_series(cbind(k,entropies), name="HypergeometricRV") %>% 
+  hc_add_theme(hc_theme_smpl()) %>% 
+  hc_title(text="Variacion de la entropia contra k") %>%   
+  hc_xAxis(title=list(text="Valores de k")) %>%          
+  hc_yAxis(title=list(text="Entropia de la funcion"))
+hc
+
+
+
+```
+
