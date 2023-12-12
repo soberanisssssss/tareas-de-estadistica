@@ -1,0 +1,146 @@
+---
+title: "AFDMD-111 Estadística"
+author: "edward roberto cauich soberanis"
+date: "09/10/2023"
+output:
+  rmdformats::readthedown:
+    highlight: kate
+    cards: no
+subtitle: Práctica con dplyr
+---
+
+
+```{r knitr_init, echo=FALSE, error=FALSE, message=FALSE, warning=FALSE, cache=FALSE}
+library(knitr)
+library(rmdformats)
+library(tidyverse)
+library(gapminder)
+library(kableExtra)
+mexicoData <- gapminder %>% filter(country == "Mexico") %>% rename(pais = country, continente = continent, año = year, esperanzaVida = lifeExp, poblacion =pop, pibPercapita =gdpPercap)
+## Global options
+options(max.print="75")
+opts_chunk$set(echo=TRUE,
+	             cache=TRUE,
+               prompt=FALSE,
+               tidy=TRUE,
+               comment=NA,
+               message=FALSE,
+               warning=FALSE)
+opts_knit$set(width=75)
+```
+
+
+## Introducción
+
+El paquete `dplyr` provee una serie de comando para la manipulación y limpieza de datos de forma rápida y eficiente. El paquete `dplyr` contiene los siguientes comandos básicos (los más utilizados):
+
+1. `select` permite extraer variables o columnas.
+2. `filter` permite extraer observaciones o filas.
+3. `rename` y `arrange` que permiten renombrar y ordenar columnas.
+4. `mutate` permite crear nuevas variables o columnas basados en las otras columnas.
+5. `group_by` permite agrupar observaciones por grupos.
+6. `summarize` o `summarise` que permite realizar sumarios con las filas y columnas.
+
+
+## Extracción de variables (columnas) con `select`.
+
+El comando `select` permite extraer columnas de una tabla o `data.frame` de diversas formas, 
+
+- Listando lo nombres de las variables.
+- Quitando variables con el signo menos ($-$).
+- Seleccionar por medio de un rango con el signo `:`.
+- Por medio del tipo de datos.
+- Por medio de funciones auxiliares como `ends_with`, `starts-with`, etc.
+
+Por ejemplo, supóngamos que de la siguiente tabla:
+
+```{r select1, echo=TRUE}
+mexicoData
+```
+
+Queremos seleccionar las variables `pais`, `esperanzaVida` y `población`. La forma de hacer en `dplyr` es de la siguiente forma (note que depués imprimimos con el comando kable() para que se visualize en el PDF o HTML):
+
+```{r select2}
+mexicoData %>% select(pais, esperanzaVida, poblacion) %>% kable()
+```
+
+### Ejercicios
+
+Supóngamos que ahora queremos seleccionar lo siguiente:
+
+- Todas las columnas, excepto población:
+```{r eje1_1, eval=FALSE}
+mexicoData %>% select(-poblacion) %>% kable()
+```
+
+- Las columnas que van de `pais` a `esperanzaVida`.
+```{r eje1_2, eval=FALSE}
+mexicoData %>% select(pais:esperanzaVida) %>% kable()
+```
+- Las columnas `pais`, `año` y `pibPercapita`
+```{r eje1_3, eval=FALSE}
+mexicoData %>% select(pais,año,pibPercapita) %>% kable()
+```
+
+El comando `select` nos permite igual ordenar las columnas de diferente forma, supóngamos que queremos `continente` al principio y todas las demás columnas igual. Lo anterior lo realizamo mediante el siguiente comando
+
+```{r select3}
+mexicoData %>% select(continente, everything()) %>% kable()
+```
+
+Note que el comando `everything` selecciona todas las columnas faltantes y las pone en el orden en el que inicialmente estaban.
+
+### Ejercicios
+
+- Ordene las columnas como: `pais`, `año`, `continente`,  `esperanzaVida`, `poblacion`, `pibPercapita`.
+
+```{r ejer1_4, eval=FALSE}
+mexicoData %>% select(pais,año,continente, everything()) %>% kable()
+```
+
+## Extracción de filas con `filter`
+
+El comando filter permite seleccionar filas u observaciones de una tabla o `data.frame`. La forma como opera, es `select(df, condición)`, es decir toma como primer argumento una tabla y en base a una `condición` extrae las filas que cumplen con esa condición. Lo anterior también se pudo realizar como: `df %>% select(condición)` usando el operado pipe (` %>% `).
+En ejemplo del funcionamiento de `filter` usando los datos `mexicoData` que representan un subconjunto de los datos `gapminder` para México es el siguiente. Supóngamos que queremos filtrar sólo las filas en las cuales la columna `esperanzaVida` es mayor a $60$, entonces,
+
+```{r filter1}
+mexicoData %>% filter(esperanzaVida > 60) %>% kable()
+```
+De igual forma podemos utilizar `select` y `filter` para crear nuevas tablas que nos sirvan para sacar conclusiones. Por ejemplo, supóngamos que deseamos sólo los datos del PIB per capita de los años 1977 a 1997 de México. Lo anterior lo obtenemos como:
+
+
+```{r filter2}
+mexicoData %>% filter(año >= 1977 & año <= 1997) %>% select(pais, año, pibPercapita) %>% kable()
+```
+
+### Ejercicios
+
+Obtenga lo siguiente de la tabla `mexicoData`:
+
+- Sólo las observaciones para las cuales la esperanza de vida es mayor que 65.
+```{r ejer2_1, eval=FALSE}
+mexicoData %>% filter(esperanzaVida > 65) %>% kable()
+```
+
+- Sólo las observaciones de los años $1957$, $1967$, $1987$ y $2007$
+```{r ejer2_2, eval=FALSE}
+mexicoData %>% filter(año %in% c(1957,1967,1987,2007)) %>% kable()
+```
+
+- Ahora utilizaremos la tabla llamada `starwars` y filtraremos sólo aquellos personajes con color de ojos (`eye_color`) azules ("blue") y seleccionaremos sólo las columnas con nombre `name`, `eye_color`, y `gender`.
+```{r ejer2_3, eval=FALSE}
+starwars %>% slice(1:20) %>% select(name:sex) %>% kable() # Primero visualizamos parte de los datos
+# ahora filtramos y seleccionamos
+starwars %>% filter(eye_color == "blue") %>% select(name, eye_color, gender) %>%  kable()
+```
+- Extraiga sólo aquellos personajes del mundo "Tatooine" del género masculino y posteriomente seleccione las variables `name` y `homeworld`.
+```{r ejer2_4, eval=FALSE}
+starwars %>% filter(homeworld== "Tatooine" & gender == "masculine") %>%  select(name, homeworld) %>% kable()
+```
+
+- Extraiga a todos los humanos del género femenino con altura mayor de 1 metro y imprima las columnas `name`, `gender`, `height` y `species`.
+```{r ejer2_5, eval=FALSE}
+starwars %>% filter(species== "Human" & gender == "feminine" & height > 100) %>% select(name, gender, height, species) %>% kable()
+```
+
+
