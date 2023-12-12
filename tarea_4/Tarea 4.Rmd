@@ -1,0 +1,471 @@
+---
+title: "AFDMD-111 Estadística"
+subtitle: "Lectura de archivos en R"
+author: "edward roberto cauich soberanis"
+date: "20/09/2023"
+output:
+  rmdformats::material:
+    highlight: kate
+    cards: false
+---
+
+
+```{r knitr_init, echo=FALSE, message=TRUE, cache=FALSE, warnings=F}
+library(knitr)
+library(rmdformats)
+library(tabulizer)
+library(magrittr)
+library(highcharter)
+## Global options
+options(max.print="75")
+opts_chunk$set(echo=TRUE,
+	             cache=TRUE,
+               prompt=FALSE,
+               tidy=TRUE,
+               comment=NA,
+               message=FALSE,
+               warning=FALSE)
+opts_knit$set(width=75)
+```
+
+# Lectura de archivos en R
+
+`R` puede leer una gran cantidad de archivos incluyendo archivos `.txt`, `.csv`, `.xls`, `.pdf`, etc. Mediante el uso del paquete `tabulizer` se pueden leer tablas que se encuentran en documentos `PDF`. En la siguiente actividad se instalará y cargará el paquete `tabulizer` mediante los comandos:
+
+```{r eval=FALSE}
+install.packages("tabulizer", dependencies = TRUE)   # Instala tabulizer
+library(tabulizer)                                   # Carga tabulizer
+
+```
+
+Posteriormente se leerá la tabla localizada en el archivo `seccion_calificacionesmsosa247.pdf` que se encuentra en la sección de **archivos** del *Teams* (lo anterior se puede hacer mediante el comando `extract_tables` del tabulizer). Una vez cargada la tabla que se llamará `tablaAlumnos` se realizarán las siguientes actividades:
+
+1.- Graficar `No` contra `Parcial 1`.
+
+2.- Graficar `No` contra `Parcial 2`.
+
+3.- Renombrar `Ev.` a `Parcial 3` (mostrar el `data.frame` resultante).
+
+4.- Graficar `No` contra `Parcial 1`, `Parcial 2`.
+
+5.- ¿Cuál es la media de las calificaciones finales? ¿Quién obtuvo la calificación más baja? ¿Quién obtuvo el mejor promedio? (anexar el código que lo calcula).
+
+6.- Cree una nueva columna llamada `promedio` (esto lo puede hacer con `mutate` del paquete `dplyr`) y compárela con la columna `Calif.` (¿Qué se puede observar?).
+
+
+Posteriormente lea el archivo `it0103_2016_01.csv` (lo puede hacer mediante el comando `read.csv()`) el cual es una versión `sucia` del archivo anterior y replique cada uno de los puntos de arriba (sí es necesario modifique el data.frame resultante).
+
+```{r sd}
+library(tabulizer)
+tab <-  extract_tables("seccion_calificacionesmsosa247.pdf",output = "data.frame")
+
+tab[[1]]
+
+
+str(tab)
+```
+##**1.- Graficar `No` contra `Parcial 1`.**
+
+```{r s}
+library(knitr)
+library(rmdformats)
+library(tabulizer)
+library(magrittr)
+library(highcharter)
+tab <-  extract_tables("seccion_calificacionesmsosa247.pdf",output = "data.frame")
+tab <- tab[[1]]
+
+highchart() %>%
+  hc_chart(type = "column") %>%  
+  hc_add_series(cbind(tab$NO, tab$Parcial), name = "Calificaciones 'No' contra 'Parcial 1'") %>%
+  hc_add_theme(hc_theme_darkunica())
+
+```
+##**2.- Graficar `No` contra `Parcial 2`.**
+
+```{r d}
+library(knitr)
+library(rmdformats)
+library(tabulizer)
+library(magrittr)
+library(highcharter)
+tab <-  extract_tables("seccion_calificacionesmsosa247.pdf",output = "data.frame")
+tab <- tab[[1]]
+
+highchart() %>%
+  hc_chart(type = "column") %>%  
+  hc_add_series(cbind(tab$NO, tab$Parcial.1), name = "Calificaciones 'No' contra 'Parcial 2'") %>%
+  hc_add_theme(hc_theme_darkunica())
+
+```
+##**3.- Renombrar `Ev.` a `Parcial 3` (mostrar el `data.frame` resultante).**
+
+```{r cambio}
+library(knitr)
+library(rmdformats)
+library(tabulizer)
+library(magrittr)
+library(highcharter)
+tab <-  extract_tables("seccion_calificacionesmsosa247.pdf",output = "data.frame")
+tab <- tab[[1]]
+print(tab)
+colnames(tab)[colnames(tab) == "Ev."] <- "Parcial.3"
+
+print(tab)
+```
+
+
+##**4.- Graficar `No` contra `Parcial 1`, `Parcial 2`.**
+```{r compa}
+library(knitr)
+library(rmdformats)
+library(tabulizer)
+library(magrittr)
+library(highcharter)
+tab <-  extract_tables("seccion_calificacionesmsosa247.pdf",output = "data.frame")
+tab <- tab[[1]]
+
+highchart() %>%
+  hc_chart(type = "column") %>%  
+  hc_add_series(cbind(tab$NO, tab$Parcial), name = "Calificaciones 'No' contra 'Parcial 1'") %>% hc_add_series(cbind(tab$NO, tab$Parcial.1), name = "Calificaciones 'No' contra 'Parcial 2'") %>%hc_add_theme(hc_theme_darkunica())
+```
+
+
+##**5.- ¿Cuál es la media de las calificaciones finales? ¿Quién obtuvo la calificación más baja? ¿Quién obtuvo el mejor promedio? (anexar el código que lo calcula).**
+
+```{r media}
+library(knitr)
+library(rmdformats)
+library(tabulizer)
+library(magrittr)
+library(highcharter)
+tab <-  extract_tables("seccion_calificacionesmsosa247.pdf",output = "data.frame")
+tab <- tab[[1]]
+
+#la media de las calificaciones 
+print(tab$Calif.)
+```
+```{r minima}
+library(knitr)
+library(rmdformats)
+library(tabulizer)
+library(magrittr)
+library(highcharter)
+tab <-  extract_tables("seccion_calificacionesmsosa247.pdf",output = "data.frame")
+tab <- tab[[1]]
+calificacion_minima <- min(tab$Calif.)
+mini_promedio <- tab[tab$Calif. == calificacion_minima, ]
+
+mini_promedio
+```
+
+```{r maxima}
+library(knitr)
+library(rmdformats)
+library(tabulizer)
+library(magrittr)
+library(highcharter)
+tab <-  extract_tables("seccion_calificacionesmsosa247.pdf",output = "data.frame")
+tab <- tab[[1]]
+
+maxima <- max(tab$Calif.)
+
+max_promedio <- tab[tab$Calif. == maxima, ]
+
+max_promedio
+```
+
+##**6.- Cree una nueva columna llamada `promedio` (esto lo puede hacer con `mutate` del paquete `dplyr`) y compárela con la columna `Calif.` (¿Qué se puede observar?).**
+
+
+```{r nuevo}
+library(knitr)
+library(rmdformats)
+library(tabulizer)
+library(magrittr)
+library(highcharter)
+tab <-  extract_tables("seccion_calificacionesmsosa247.pdf",output = "data.frame")
+tab <- tab[[1]]
+tab$Promedio <- (tab$Parcial + tab$Parcial.1 + tab$Ev. )/3
+tab$Promedio <- as.integer(tab$Promedio)
+
+print(tab)
+```
+
+##**Posteriormente lea el archivo `it0103_2016_01.csv` (lo puede hacer mediante el comando `read.csv()`) el cual es una versión `sucia` del archivo anterior y replique cada uno de los puntos de arriba (sí es necesario modifique el data.frame resultante).**
+
+
+```{r ml}
+library(tabulizer)
+tab <- read.csv("it0103_2016_01.csv")
+
+
+tab[[1]]
+
+
+str(tab)
+```
+```{r modd}
+library(tabulizer)
+tab <- read.csv("it0103_2016_01.csv")
+tab <- tab[[1]]
+print(tab)
+```
+
+
+
+
+```{r mod1}
+library(tabulizer)
+tab <- datos <- read.csv("it0103_2016_01.csv")
+tab$Parcial1 <- tab$Calificacion[1:24]
+tab$Parcial2 <- tab$Calificacion[25:48]
+tab$Parcial3 <- tab$Calificacion[49:72]
+
+tab <- subset(tab, select = -c(Examen, Calificacion))
+
+tab$No[25:72] <- NA
+tab$Matricula[25:72] <- NA
+tab$Nombre[25:72] <- NA
+tab$Parcial1[25:72] <- NA
+tab$Parcial2[25:72] <- NA
+tab$Parcial3[25:72] <- NA
+tab$Calif.[25:72] <- NA
+
+tab <- tab[complete.cases(tab), ]
+
+tab <- tab[, c("No","Matricula","Nombre",  "Parcial1", "Parcial2", "Parcial3","Calif.")]
+
+print(tab)
+```
+
+
+
+
+
+
+##**1.- Graficar `No` contra `Parcial 1`.**
+
+```{r ml1}
+library(knitr)
+library(rmdformats)
+library(tabulizer)
+library(magrittr)
+library(highcharter)
+tab <- datos <- read.csv("it0103_2016_01.csv")
+
+tab$Parcial1 <- tab$Calificacion[1:24]
+tab$Parcial2 <- tab$Calificacion[25:48]
+tab$Parcial3 <- tab$Calificacion[49:72]
+
+tab <- subset(tab, select = -c(Examen, Calificacion))
+
+tab$No[25:72] <- NA
+tab$Matricula[25:72] <- NA
+tab$Nombre[25:72] <- NA
+tab$Parcial1[25:72] <- NA
+tab$Parcial2[25:72] <- NA
+tab$Parcial3[25:72] <- NA
+tab$Calif.[25:72] <- NA
+
+tab <- tab[complete.cases(tab), ]
+
+#------------------------ grafica
+highchart() %>%
+  hc_chart(type = "column") %>%  
+  hc_add_series(cbind(tab$No, tab$Parcial1), name = "Calificaciones 'No' contra 'Parcial 1'") %>%
+  hc_add_theme(hc_theme_darkunica())
+
+```
+
+##**2.- Graficar `No` contra `Parcial 2`.**
+
+```{r ml2}
+library(knitr)
+library(rmdformats)
+library(tabulizer)
+library(magrittr)
+library(highcharter)
+tab <- datos <- read.csv("it0103_2016_01.csv")
+
+tab$Parcial1 <- tab$Calificacion[1:24]
+tab$Parcial2 <- tab$Calificacion[25:48]
+tab$Parcial3 <- tab$Calificacion[49:72]
+
+tab <- subset(tab, select = -c(Examen, Calificacion))
+
+tab$No[25:72] <- NA
+tab$Matricula[25:72] <- NA
+tab$Nombre[25:72] <- NA
+tab$Parcial1[25:72] <- NA
+tab$Parcial2[25:72] <- NA
+tab$Parcial3[25:72] <- NA
+tab$Calif.[25:72] <- NA
+
+tab <- tab[complete.cases(tab), ]
+
+#------------------------ grafica
+highchart() %>%
+  hc_chart(type = "column") %>%  
+  hc_add_series(cbind(tab$No, tab$Parcial2), name = "Calificaciones 'No' contra 'Parcial 1'") %>%
+  hc_add_theme(hc_theme_darkunica())
+```
+
+##**4.- Graficar `No` contra `Parcial 1`, `Parcial 2`.**
+```{r ml3}
+library(knitr)
+library(rmdformats)
+library(tabulizer)
+library(magrittr)
+library(highcharter)
+tab <- datos <- read.csv("it0103_2016_01.csv")
+
+tab$Parcial1 <- tab$Calificacion[1:24]
+tab$Parcial2 <- tab$Calificacion[25:48]
+tab$Parcial3 <- tab$Calificacion[49:72]
+
+tab <- subset(tab, select = -c(Examen, Calificacion))
+
+tab$No[25:72] <- NA
+tab$Matricula[25:72] <- NA
+tab$Nombre[25:72] <- NA
+tab$Parcial1[25:72] <- NA
+tab$Parcial2[25:72] <- NA
+tab$Parcial3[25:72] <- NA
+tab$Calif.[25:72] <- NA
+
+tab <- tab[complete.cases(tab), ]
+
+#----grafica
+highchart() %>%
+  hc_chart(type = "column") %>%  
+  hc_add_series(cbind(tab$No, tab$Parcial1), name = "Calificaciones 'No' contra 'Parcial 1'") %>% hc_add_series(cbind(tab$NO, tab$Parcial2), name = "Calificaciones 'No' contra 'Parcial 2'") %>%hc_add_theme(hc_theme_darkunica())
+```
+
+##**5.- ¿Cuál es la media de las calificaciones finales? ¿Quién obtuvo la calificación más baja? ¿Quién obtuvo el mejor promedio? (anexar el código que lo calcula).**
+
+```{r ml4}
+library(knitr)
+library(rmdformats)
+library(tabulizer)
+library(magrittr)
+library(highcharter)
+tab <- datos <- read.csv("it0103_2016_01.csv")
+
+tab$Parcial1 <- tab$Calificacion[1:24]
+tab$Parcial2 <- tab$Calificacion[25:48]
+tab$Parcial3 <- tab$Calificacion[49:72]
+
+tab <- subset(tab, select = -c(Examen, Calificacion))
+
+tab$No[25:72] <- NA
+tab$Matricula[25:72] <- NA
+tab$Nombre[25:72] <- NA
+tab$Parcial1[25:72] <- NA
+tab$Parcial2[25:72] <- NA
+tab$Parcial3[25:72] <- NA
+tab$Calif.[25:72] <- NA
+
+tab <- tab[complete.cases(tab), ]
+
+#la media de las calificaciones 
+media2 <- tab$Calif.
+media2
+```
+
+```{r minima2}
+library(knitr)
+library(rmdformats)
+library(tabulizer)
+library(magrittr)
+library(highcharter)
+tab <- datos <- read.csv("it0103_2016_01.csv")
+
+tab$Parcial1 <- tab$Calificacion[1:24]
+tab$Parcial2 <- tab$Calificacion[25:48]
+tab$Parcial3 <- tab$Calificacion[49:72]
+
+tab <- subset(tab, select = -c(Examen, Calificacion))
+
+tab$No[25:72] <- NA
+tab$Matricula[25:72] <- NA
+tab$Nombre[25:72] <- NA
+tab$Parcial1[25:72] <- NA
+tab$Parcial2[25:72] <- NA
+tab$Parcial3[25:72] <- NA
+tab$Calif.[25:72] <- NA
+
+tab <- tab[complete.cases(tab), ]
+calificacion_minima <- min(tab$Calif.)
+mini_promedio <- tab[tab$Calif. == calificacion_minima, ]
+
+mini_promedio
+```
+
+```{r maxima2}
+library(knitr)
+library(rmdformats)
+library(tabulizer)
+library(magrittr)
+library(highcharter)
+tab <- datos <- read.csv("it0103_2016_01.csv")
+
+tab$Parcial1 <- tab$Calificacion[1:24]
+tab$Parcial2 <- tab$Calificacion[25:48]
+tab$Parcial3 <- tab$Calificacion[49:72]
+
+tab <- subset(tab, select = -c(Examen, Calificacion))
+
+tab$No[25:72] <- NA
+tab$Matricula[25:72] <- NA
+tab$Nombre[25:72] <- NA
+tab$Parcial1[25:72] <- NA
+tab$Parcial2[25:72] <- NA
+tab$Parcial3[25:72] <- NA
+tab$Calif.[25:72] <- NA
+
+tab <- tab[complete.cases(tab), ]
+
+maxima <- max(tab$Calif.)
+
+max_promedio <- tab[tab$Calif. == maxima, ]
+
+max_promedio
+```
+
+##**6.- Cree una nueva columna llamada `promedio` (esto lo puede hacer con `mutate` del paquete `dplyr`) y compárela con la columna `Calif.` (¿Qué se puede observar?).**
+
+
+```{r ml5}
+library(knitr)
+library(rmdformats)
+library(tabulizer)
+library(magrittr)
+library(highcharter)
+tab <- datos <- read.csv("it0103_2016_01.csv")
+
+tab$Parcial1 <- tab$Calificacion[1:24]
+tab$Parcial2 <- tab$Calificacion[25:48]
+tab$Parcial3 <- tab$Calificacion[49:72]
+
+tab <- subset(tab, select = -c(Examen, Calificacion))
+
+tab$No[25:72] <- NA
+tab$Matricula[25:72] <- NA
+tab$Nombre[25:72] <- NA
+tab$Parcial1[25:72] <- NA
+tab$Parcial2[25:72] <- NA
+tab$Parcial3[25:72] <- NA
+tab$Calif.[25:72] <- NA
+
+tab <- tab[complete.cases(tab), ]
+
+
+tab$Promedio <- (tab$Parcial1 + tab$Parcial2 + tab$Parcial3 )/3
+tab$Promedio <- as.integer(tab$Promedio)
+
+tab <- tab[, c("No","Matricula","Nombre","Parcial1","Parcial2", "Parcial3","Calif.","Promedio")]
+
+print(tab)
+```
+
